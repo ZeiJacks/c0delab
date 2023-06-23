@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14.2-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db:/var/lib/postgresql/data
+  api:
+    tty: true
+    depends_on:
+      - db
+    build:
+      context: ./api/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/c0delab
+    command: bundle exec rails s -b 0.0.0.0
+  front:
+    build:
+      context: ./front/
+      dockerfile: Dockerfile
+    volumes:
+      - ./front/app:/usr/src/app
+    command: 'yarn dev'
+    ports:
+      - "8000:3000"
+volumes:
+  db:
